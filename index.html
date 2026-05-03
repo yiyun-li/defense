@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eight Model Principles for SLE Risk Prediction</title>
+  <style>
+    :root {
+      --ink: #172026;
+      --muted: #637078;
+      --line: #d8dee2;
+      --panel: #ffffff;
+      --wash: #f5f4ee;
+      --accent: #0f766e;
+      --accent-soft: color-mix(in srgb, var(--accent) 12%, #fff);
+      --accent-faint: color-mix(in srgb, var(--accent) 7%, #fff);
+      --shadow: 0 20px 55px rgba(23, 32, 38, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(248, 247, 242, 0.97), rgba(235, 242, 239, 0.95)),
+        radial-gradient(circle at 16% 8%, rgba(15, 118, 110, 0.14), transparent 34%);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 24px 20px;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 252, 0.92);
+    }
+
+    .brand {
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-title {
+      margin: 20px 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .model-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .model-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .model-button:hover,
+    .model-button:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--button-color);
+      box-shadow: 0 10px 26px rgba(23, 32, 38, 0.10);
+      outline: none;
+    }
+
+    .model-button.active {
+      border-color: var(--button-color);
+      box-shadow: inset 4px 0 0 var(--button-color), 0 10px 26px rgba(23, 32, 38, 0.09);
+    }
+
+    .badge {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--button-color);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .model-button strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .model-button small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cue {
+      margin-top: 18px;
+      padding: 13px;
+      border: 1px solid #ead7a2;
+      border-radius: 8px;
+      background: #fff8e8;
+      color: #68470d;
+      font-size: 13px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .hero {
+      min-height: calc(100vh - 48px);
+      display: grid;
+      grid-template-rows: auto minmax(460px, 1fr) auto;
+      gap: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+    }
+
+    .model-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title-row h2 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(36px, 5vw, 70px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+      border-radius: 999px;
+      background: var(--accent-faint);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .icon-button {
+      min-width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .canvas-card {
+      position: relative;
+      min-height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(216, 222, 226, 0.34) 1px, transparent 1px),
+        linear-gradient(rgba(216, 222, 226, 0.34) 1px, transparent 1px),
+        #fbfcfc;
+      background-size: 32px 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .canvas-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 32%);
+      pointer-events: none;
+    }
+
+    .diagram {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    svg {
+      width: min(100%, 1120px);
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .node {
+      fill: #fff;
+      stroke: var(--accent);
+      stroke-width: 2.5;
+      filter: drop-shadow(0 8px 12px rgba(23, 32, 38, 0.08));
+    }
+
+    .soft {
+      fill: var(--accent-soft);
+      stroke: color-mix(in srgb, var(--accent) 44%, var(--line));
+      stroke-width: 2;
+    }
+
+    .line {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .thin {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .dash {
+      stroke-dasharray: 10 10;
+      animation: dash 1.9s linear infinite;
+    }
+
+    .signal {
+      animation: pulse 1.7s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .float {
+      animation: float 3.2s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .sweep {
+      animation: sweep 2.4s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .text {
+      fill: var(--ink);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .small {
+      fill: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .formula {
+      fill: var(--accent);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .note-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .note {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.88);
+      min-height: 118px;
+    }
+
+    .note strong {
+      display: block;
+      color: var(--accent);
+      font-size: 13px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .note p {
+      margin: 0;
+      color: #334148;
+      font-size: 15px;
+    }
+
+    @keyframes dash {
+      from { stroke-dashoffset: 42; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.58; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes glow {
+      0%, 100% { opacity: 0.28; }
+      50% { opacity: 0.95; }
+    }
+
+    @keyframes sweep {
+      0%, 100% { transform: translateX(-8px); opacity: 0.34; }
+      50% { transform: translateX(14px); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dash, .signal, .float, .glow, .sweep { animation: none; }
+    }
+
+    @media (max-width: 1050px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .model-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero { min-height: auto; }
+      .topbar { align-items: start; }
+    }
+
+    @media (max-width: 720px) {
+      .main { padding: 14px; }
+      .sidebar { padding: 18px 14px; }
+      .model-list,
+      .note-row { grid-template-columns: 1fr; }
+      .topbar { display: grid; }
+      .canvas-card { min-height: 460px; }
+      .diagram {
+        min-height: 460px;
+        place-items: center start;
+        overflow-x: auto;
+      }
+      .diagram svg {
+        min-width: 760px;
+      }
+      .note { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <section class="brand">
+        <h1>Eight Model Principles for SLE Risk Prediction</h1>
+        <p>A defense-ready interactive board focused on how each model learns scores and is finally compared by external AUC.</p>
+      </section>
+
+      <div class="nav-title">Models</div>
+      <nav class="model-list" id="modelList" aria-label="Model selector"></nav>
+
+      <div class="cue">
+        Presentation rhythm: explain each model in three beats: training data, learned parameters, and Area Under the Curve evaluation.
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero" aria-live="polite">
+        <header class="topbar">
+          <div>
+            <div class="model-label" id="modelFamily">Linear PRS baseline</div>
+            <div class="title-row">
+              <h2 id="modelName">PRSice2</h2>
+              <span class="pill" id="modelBias">Additive effects</span>
+              <span class="pill" id="aucBadge">External AUC</span>
+            </div>
+          </div>
+          <div class="controls" aria-label="Model navigation">
+            <button class="icon-button" id="prevButton" type="button" title="Previous model" aria-label="Previous model">‹</button>
+            <button class="icon-button" id="nextButton" type="button" title="Next model" aria-label="Next model">›</button>
+          </div>
+        </header>
+
+        <article class="canvas-card">
+          <div class="diagram" id="diagram"></div>
+        </article>
+
+        <section class="note-row">
+          <article class="note">
+            <strong>Training</strong>
+            <p id="coreIdea"></p>
+          </article>
+          <article class="note">
+            <strong>Learned object</strong>
+            <p id="animationNote"></p>
+          </article>
+          <article class="note">
+            <strong>Evaluation endpoint</strong>
+            <p id="defenseLine"></p>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const models = [
+      {
+        id: "prsice2",
+        short: "P2",
+        name: "PRSice2",
+        family: "Linear PRS baseline",
+        accent: "#0f766e",
+        bias: "Clumping + thresholding",
+        auc: "JN 0.544 | EUR 0.539",
+        core: "Fold-specific GWAS estimates SNP effect sizes and p-values in the HK training fold; clumping and thresholding decide which loci enter the score.",
+        animation: "The learned object is a sparse list of selected SNPs and their GWAS beta weights.",
+        defense: "For each external sample, the PRS score is used to rank cases above controls; the reported endpoint is external AUC."
+      },
+      {
+        id: "lassosum",
+        short: "LS",
+        name: "LassoSum",
+        family: "Linear PRS baseline",
+        accent: "#2563eb",
+        bias: "Sparse shrinkage",
+        auc: "JN 0.613 | EUR 0.533",
+        core: "GWAS summary statistics and an LD reference are optimized under an L1 penalty, so correlated or weak SNP effects are shrunk during training.",
+        animation: "The learned object is a regularized beta vector: some weights remain active, many weights move toward zero.",
+        defense: "The shrinkage-weighted score is evaluated by ROC ranking on JN and EUR; AUC is the final comparison metric."
+      },
+      {
+        id: "xgboost",
+        short: "XG",
+        name: "XGBoost",
+        family: "Classical machine learning",
+        accent: "#be3455",
+        bias: "Sequential boosted trees",
+        auc: "JN 0.586 | EUR 0.584",
+        core: "Training starts with SNP features and labels; each new tree is fitted to the residual errors left by the current ensemble.",
+        animation: "The learned object is an ordered set of split rules and leaf scores, with regularization controlling tree complexity.",
+        defense: "Leaf scores are converted into sample-level prediction scores, and the external ranking is summarized as Area Under the Curve."
+      },
+      {
+        id: "rf",
+        short: "RF",
+        name: "Random Forest",
+        family: "Classical machine learning",
+        accent: "#3f7d20",
+        bias: "Bagging + feature randomness",
+        auc: "JN 0.589 | EUR 0.577",
+        core: "Training repeatedly samples individuals with replacement and considers random SNP subsets at each split.",
+        animation: "The learned object is a forest of diverse decision trees, each carrying different SNP split rules.",
+        defense: "Tree votes become prediction scores; the final thesis result is their AUC on the held-out external cohorts."
+      },
+      {
+        id: "svm",
+        short: "SV",
+        name: "SVM",
+        family: "Classical machine learning",
+        accent: "#b7791f",
+        bias: "Maximum margin",
+        auc: "JN 0.587 | EUR 0.554",
+        core: "Training searches for a sparse linear hyperplane that separates cases and controls with the widest possible margin.",
+        animation: "The learned object is a weight vector and intercept; support vectors near the margin determine the boundary.",
+        defense: "The calibrated decision scores are not the final table entry by themselves; they are summarized by external AUC."
+      },
+      {
+        id: "mlp",
+        short: "ML",
+        name: "MLP",
+        family: "Deep learning",
+        accent: "#6d4fb3",
+        bias: "Layered nonlinear representation",
+        auc: "JN 0.617 | EUR 0.590",
+        core: "Training minimizes binary cross-entropy by backpropagation; gradients update dense layer weights after each batch.",
+        animation: "The learned object is a stack of weight matrices, with hidden widths set adaptively from the input dimension d.",
+        defense: "The MLP outputs scores for all external samples; ranking those scores gives the reported AUC, highest on JN in the SNP benchmark."
+      },
+      {
+        id: "gnn",
+        short: "GN",
+        name: "GNN",
+        family: "Deep learning",
+        accent: "#0f5f8f",
+        bias: "Sample-similarity graph",
+        auc: "JN 0.615 | EUR 0.596",
+        core: "Training first builds a weighted kNN graph from genotype cosine similarity, then optimizes GCN weights by label supervision.",
+        animation: "The learned object combines adaptive graph construction, GCN message-passing weights, and a classifier head over sample embeddings.",
+        defense: "Graph-informed prediction scores are evaluated by AUC; GNN gives the strongest EUR SNP-benchmark AUC."
+      },
+      {
+        id: "transformer",
+        short: "TF",
+        name: "Transformer",
+        family: "Deep learning",
+        accent: "#263238",
+        bias: "Self-attention over loci",
+        auc: "SNP: JN 0.607 | EUR 0.566; Gene: approx. 0.630 | 0.599",
+        core: "Training tokenizes SNPs, SNP patches, or genes and learns attention/query/key/value matrices by backpropagation.",
+        animation: "The learned object is an attention system whose width, depth, feed-forward size, and tokenization mode adapt to the SNP feature dimension.",
+        defense: "The CLS readout produces external prediction scores; Area Under the Curve is then computed, with gene-level Transformer giving the strongest gene-level AUC."
+      }
+    ];
+
+    let activeIndex = 0;
+
+    const app = document.getElementById("app");
+    const modelList = document.getElementById("modelList");
+    const diagram = document.getElementById("diagram");
+
+    function setAccent(color) {
+      app.style.setProperty("--accent", color);
+    }
+
+    function renderButtons() {
+      modelList.innerHTML = models.map((model, index) => `
+        <button class="model-button ${index === activeIndex ? "active" : ""}" style="--button-color:${model.accent}" data-index="${index}" type="button">
+          <span class="badge">${model.short}</span>
+          <span><strong>${model.name}</strong><small>${model.bias}</small></span>
+        </button>
+      `).join("");
+      modelList.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          activeIndex = Number(button.dataset.index);
+          updateModel();
+        });
+      });
+    }
+
+    function updateModel() {
+      const model = models[activeIndex];
+      setAccent(model.accent);
+      document.getElementById("modelFamily").textContent = model.family;
+      document.getElementById("modelName").textContent = model.name;
+      document.getElementById("modelBias").textContent = model.bias;
+      document.getElementById("aucBadge").textContent = `External AUC: ${model.auc}`;
+      document.getElementById("coreIdea").textContent = model.core;
+      document.getElementById("animationNote").textContent = model.animation;
+      document.getElementById("defenseLine").textContent = model.defense;
+      diagram.innerHTML = diagrams[model.id](model);
+      renderButtons();
+    }
+
+    document.getElementById("prevButton").addEventListener("click", () => {
+      activeIndex = (activeIndex - 1 + models.length) % models.length;
+      updateModel();
+    });
+
+    document.getElementById("nextButton").addEventListener("click", () => {
+      activeIndex = (activeIndex + 1) % models.length;
+      updateModel();
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft") document.getElementById("prevButton").click();
+      if (event.key === "ArrowRight") document.getElementById("nextButton").click();
+    });
+
+    const marker = color => `
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="${color}"></path>
+        </marker>
+      </defs>
+    `;
+
+    const stageLabels = () => `
+      <text class="small" x="190" y="42" text-anchor="middle">TRAINING DATA</text>
+      <text class="small" x="560" y="42" text-anchor="middle">LEARNED PARAMETERS</text>
+      <text class="small" x="930" y="42" text-anchor="middle">EXTERNAL SCORES → AUC</text>
+      <line class="thin" x1="320" y1="34" x2="320" y2="456" opacity=".18"></line>
+      <line class="thin" x1="800" y1="34" x2="800" y2="456" opacity=".18"></line>
+    `;
+
+    const snpStack = (x, y, labels = ["SNP1", "SNP2", "SNP3", "SNP4"]) => labels.map((label, i) => `
+      <rect class="node signal" style="animation-delay:${i * 0.18}s" x="${x}" y="${y + i * 58}" width="96" height="38" rx="8"></rect>
+      <text class="small" x="${x + 48}" y="${y + i * 58 + 24}" text-anchor="middle">${label}</text>
+    `).join("");
+
+    const miniTable = (x, y) => `
+      <rect class="soft" x="${x}" y="${y}" width="190" height="172" rx="12"></rect>
+      <text class="text" x="${x + 95}" y="${y + 32}" text-anchor="middle">HK training fold</text>
+      ${["ID", "SNPs", "y"].map((label, i) => `<text class="small" x="${x + 32 + i * 58}" y="${y + 62}" text-anchor="middle">${label}</text>`).join("")}
+      ${[0,1,2].map((r) => `
+        <line class="thin" x1="${x + 20}" y1="${y + 78 + r * 28}" x2="${x + 170}" y2="${y + 78 + r * 28}" opacity=".22"></line>
+        <circle class="node signal" style="animation-delay:${r * .16}s" cx="${x + 32}" cy="${y + 92 + r * 28}" r="7"></circle>
+        <rect class="node" x="${x + 72}" y="${y + 84 + r * 28}" width="52" height="16" rx="4"></rect>
+        <text class="small" x="${x + 156}" y="${y + 98 + r * 28}" text-anchor="middle">${r === 1 ? "1" : "0"}</text>
+      `).join("")}
+    `;
+
+    const newSample = (x, y) => `
+      <rect class="soft signal" x="${x}" y="${y}" width="150" height="116" rx="12"></rect>
+      <text class="text" x="${x + 75}" y="${y + 34}" text-anchor="middle">External cohort</text>
+      <text class="small" x="${x + 75}" y="${y + 64}" text-anchor="middle">sample scores</text>
+      <text class="formula" x="${x + 75}" y="${y + 96}" text-anchor="middle">sᵢ</text>
+    `;
+
+    const aucPanel = (x, y, label = "prediction scores") => `
+      <rect class="soft signal" x="${x}" y="${y}" width="176" height="138" rx="12"></rect>
+      <text class="text" x="${x + 88}" y="${y + 28}" text-anchor="middle">AUC</text>
+      <line class="thin" x1="${x + 38}" y1="${y + 104}" x2="${x + 142}" y2="${y + 104}" opacity=".72"></line>
+      <line class="thin" x1="${x + 38}" y1="${y + 104}" x2="${x + 38}" y2="${y + 44}" opacity=".72"></line>
+      <line class="thin" x1="${x + 38}" y1="${y + 104}" x2="${x + 142}" y2="${y + 44}" opacity=".22" stroke-dasharray="5 5"></line>
+      <path d="M ${x + 38} ${y + 104}
+               C ${x + 54} ${y + 72}, ${x + 78} ${y + 55}, ${x + 106} ${y + 48}
+               C ${x + 122} ${y + 44}, ${x + 134} ${y + 44}, ${x + 142} ${y + 44}
+               L ${x + 142} ${y + 104} Z"
+            fill="var(--accent)" opacity=".14" stroke="none"></path>
+      <path class="line" d="M ${x + 38} ${y + 104}
+               C ${x + 54} ${y + 72}, ${x + 78} ${y + 55}, ${x + 106} ${y + 48}
+               C ${x + 122} ${y + 44}, ${x + 134} ${y + 44}, ${x + 142} ${y + 44}"></path>
+      <text class="small" x="${x + 90}" y="${y + 123}" text-anchor="middle">FPR</text>
+      <text class="small" x="${x + 24}" y="${y + 78}" text-anchor="middle" transform="rotate(-90 ${x + 24} ${y + 78})">TPR</text>
+      <text class="small" x="${x + 88}" y="${y + 146}" text-anchor="middle">Area Under the Curve</text>
+      <text class="small" x="${x + 88}" y="${y + 164}" text-anchor="middle">${label}</text>
+    `;
+
+    const adaptivePanel = (x, y, title, rows) => `
+      <rect class="node" x="${x}" y="${y}" width="270" height="${58 + rows.length * 24}" rx="10"></rect>
+      <text class="text" x="${x + 135}" y="${y + 28}" text-anchor="middle">${title}</text>
+      ${rows.map((row, i) => `<text class="small" x="${x + 135}" y="${y + 56 + i * 24}" text-anchor="middle">${row}</text>`).join("")}
+    `;
+
+    const diagrams = {
+      prsice2: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="PRSice2 mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          ${miniTable(82, 112)}
+          <path class="line dash" marker-end="url(#arrow)" d="M 284 196 H 380"></path>
+          <rect class="soft" x="390" y="88" width="330" height="252" rx="14"></rect>
+          <text class="text" x="555" y="126" text-anchor="middle">GWAS betas + p-values</text>
+          <text class="small" x="555" y="154" text-anchor="middle">threshold, then LD clumping</text>
+          ${snpStack(438, 178, ["rsA β=.18", "rsC β=.09", "rsE β=.14"])}
+          <path class="thin sweep" d="M 602 190 H 690 M 602 248 H 690 M 602 306 H 690"></path>
+          <path class="line dash" marker-end="url(#arrow)" d="M 730 220 H 844"></path>
+          ${newSample(858, 116)}
+          ${aucPanel(850, 276, "from PRS scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training learns selected beta weights; external PRS scores are compared by Area Under the Curve.</text>
+        </svg>
+      `,
+
+      lassosum: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="LassoSum mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          <rect class="soft" x="70" y="110" width="220" height="210" rx="12"></rect>
+          <text class="text" x="180" y="146" text-anchor="middle">GWAS summary</text>
+          <text class="small" x="180" y="174" text-anchor="middle">betas + LD reference</text>
+          ${[0,1,2,3,4,5].map((_, i) => `<line class="thin signal" style="animation-delay:${i*.1}s" x1="${114+i*28}" y1="284" x2="${114+i*28}" y2="${205+(i%3)*18}"></line>`).join("")}
+          <path class="line dash" marker-end="url(#arrow)" d="M 300 214 H 408"></path>
+          <path class="soft" d="M 420 92 H 720 L 650 350 H 490 Z"></path>
+          <text class="text" x="570" y="134" text-anchor="middle">L1 shrinkage optimizer</text>
+          <text class="small" x="570" y="164" text-anchor="middle">penalize noisy / redundant effects</text>
+          ${[0,1,2,3,4,5].map((_, i) => `<line class="thin sweep" style="animation-delay:${i*.14}s" x1="${470+i*38}" y1="230" x2="${500+i*22}" y2="306"></line>`).join("")}
+          <text class="formula" x="570" y="320" text-anchor="middle">β̂ sparse</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 730 214 H 845"></path>
+          ${newSample(858, 112)}
+          ${aucPanel(850, 276, "from G · β̂ scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training shrinks the beta vector; external score rankings are summarized as AUC.</text>
+        </svg>
+      `,
+
+      xgboost: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="XGBoost mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          ${miniTable(70, 130)}
+          <path class="line dash" marker-end="url(#arrow)" d="M 275 216 H 360"></path>
+          <rect class="soft" x="372" y="86" width="360" height="270" rx="14"></rect>
+          <text class="text" x="552" y="124" text-anchor="middle">Fit residual errors</text>
+          ${[0,1,2].map((_, i) => {
+            const x = 410 + i * 104;
+            return `
+              <g class="float" style="animation-delay:${i*.18}s">
+                <circle class="node" cx="${x + 38}" cy="180" r="15"></circle>
+                <path class="thin" d="M ${x+38} 195 L ${x+16} 238 M ${x+38} 195 L ${x+60} 238"></path>
+                <rect class="node" x="${x}" y="238" width="32" height="30" rx="6"></rect>
+                <rect class="node" x="${x+48}" y="238" width="32" height="30" rx="6"></rect>
+                <text class="small" x="${x+40}" y="306" text-anchor="middle">Tree ${i+1}</text>
+              </g>
+              ${i < 2 ? `<path class="thin dash" marker-end="url(#arrow)" d="M ${x+85} 220 H ${x+105}"></path><text class="small" x="${x+96}" y="202" text-anchor="middle">residual</text>` : ""}
+            `;
+          }).join("")}
+          <text class="small" x="552" y="334" text-anchor="middle">learned split rules + leaf scores</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 742 216 H 842"></path>
+          ${newSample(858, 114)}
+          ${aucPanel(850, 278, "from summed leaf scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training builds trees sequentially; external leaf-score rankings produce the reported AUC.</text>
+        </svg>
+      `,
+
+      rf: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="Random Forest mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          <rect class="soft" x="72" y="124" width="220" height="184" rx="12"></rect>
+          <text class="text" x="182" y="162" text-anchor="middle">Bootstrap samples</text>
+          <text class="small" x="182" y="192" text-anchor="middle">random SNP subset per split</text>
+          ${[0,1,2,3].map((_, i) => `<rect class="node signal" style="animation-delay:${i*.12}s" x="${112+i*38}" y="${228+(i%2)*30}" width="58" height="22" rx="5"></rect>`).join("")}
+          <path class="line dash" marker-end="url(#arrow)" d="M 300 216 H 370"></path>
+          <rect class="soft" x="382" y="78" width="350" height="300" rx="14"></rect>
+          <text class="text" x="557" y="116" text-anchor="middle">Independent trees</text>
+          ${[0,1,2,3].map((_, i) => {
+            const x = 420 + i * 72;
+            const y = 156 + (i % 2) * 82;
+            return `
+              <g class="float" style="animation-delay:${i * .18}s">
+                <circle class="node" cx="${x + 26}" cy="${y}" r="12"></circle>
+                <path class="thin" d="M ${x+26} ${y+12} L ${x+8} ${y+48} M ${x+26} ${y+12} L ${x+44} ${y+48}"></path>
+                <rect class="node" x="${x}" y="${y+48}" width="24" height="24" rx="5"></rect>
+                <rect class="node" x="${x+34}" y="${y+48}" width="24" height="24" rx="5"></rect>
+              </g>
+            `;
+          }).join("")}
+          <text class="small" x="557" y="348" text-anchor="middle">learned diverse split-rule ensemble</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 742 216 H 842"></path>
+          ${newSample(858, 104)}
+          ${aucPanel(850, 270, "from averaged tree votes")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training creates randomized trees; averaged external votes are evaluated by AUC.</text>
+        </svg>
+      `,
+
+      svm: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="SVM mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          <rect class="soft" x="62" y="92" width="650" height="294" rx="12"></rect>
+          ${[[170,145],[225,205],[170,285],[290,260],[260,133],[340,185]].map((p, i) => `
+            <circle class="node signal" style="animation-delay:${i * .11}s" cx="${p[0]}" cy="${p[1]}" r="18"></circle>
+          `).join("")}
+          ${[[530,145],[602,190],[560,288],[650,252],[625,128],[485,222]].map((p, i) => `
+            <rect class="node signal" style="animation-delay:${i * .11}s" x="${p[0]-16}" y="${p[1]-16}" width="32" height="32" rx="7"></rect>
+          `).join("")}
+          <line class="line sweep" x1="390" y1="95" x2="500" y2="382"></line>
+          <line class="thin dash" x1="342" y1="116" x2="452" y2="404"></line>
+          <line class="thin dash" x1="438" y1="74" x2="548" y2="360"></line>
+          <text class="formula" x="445" y="250" text-anchor="middle">w · x + b</text>
+          <text class="small" x="445" y="280" text-anchor="middle">maximum-margin weights</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 724 226 H 842"></path>
+          ${newSample(858, 114)}
+          ${aucPanel(850, 278, "from calibrated margins")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training learns a margin boundary; external calibrated margins are summarized by AUC.</text>
+        </svg>
+      `,
+
+      mlp: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="MLP mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          ${miniTable(64, 136)}
+          <path class="line dash" marker-end="url(#arrow)" d="M 274 220 H 350"></path>
+          ${[0,1,2].map((layer) => {
+            const count = [5, 4, 3][layer];
+            const x = 392 + layer * 112;
+            const start = 222 - ((count - 1) * 46) / 2;
+            return Array.from({ length: count }, (_, i) => `<circle class="node float" style="animation-delay:${(layer + i) * .1}s" cx="${x}" cy="${start + i * 46}" r="16"></circle>`).join("");
+          }).join("")}
+          ${[0,1,2].map((layer) => {
+            const xs = [350, 392, 504, 616];
+            const leftCount = [5, 5, 4][layer];
+            const rightCount = [5, 4, 3][layer];
+            const leftStart = layer === 0 ? 222 - ((leftCount - 1) * 46) / 2 : 222 - ((leftCount - 1) * 46) / 2;
+            const rightStart = 222 - ((rightCount - 1) * 46) / 2;
+            return Array.from({ length: leftCount }, (_, i) => Array.from({ length: rightCount }, (_, j) => `
+              <line x1="${xs[layer]}" y1="${leftStart + i * 46}" x2="${xs[layer + 1]}" y2="${rightStart + j * 46}" stroke="${model.accent}" stroke-opacity="0.16" stroke-width="1.5"></line>
+            `).join("")).join("");
+          }).join("")}
+          ${adaptivePanel(420, 326, "Adaptive hidden widths", ["h₁=min(2048, 2d)", "h₂=min(1024, d)", "h₃=min(512, ⌊d/2⌋)"])}
+          <text class="small" x="510" y="306" text-anchor="middle">backprop updates dense weight matrices</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 676 220 H 842"></path>
+          ${newSample(858, 106)}
+          ${aucPanel(850, 272, "from sigmoid/logit scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training learns layer weights; external forward-pass scores are compared by AUC.</text>
+        </svg>
+      `,
+
+      gnn: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="GNN mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          ${[[140,140],[250,104],[360,162],[190,292],[340,314]].map((p, i, arr) => arr.slice(i + 1).map((q, j) => {
+            const keep = (i + j) % 2 === 0 || Math.abs(p[0] - q[0]) < 180;
+            return keep ? `<line class="thin dash" x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke-opacity="0.5"></line>` : "";
+          }).join("")).join("")}
+          ${[[140,140],[250,104],[360,162],[190,292],[340,314]].map((p, i) => `
+            <circle class="node float" style="animation-delay:${i * .16}s" cx="${p[0]}" cy="${p[1]}" r="30"></circle>
+            <text class="text" x="${p[0]}" y="${p[1] + 6}" text-anchor="middle">S${i + 1}</text>
+          `).join("")}
+          <text class="small" x="250" y="390" text-anchor="middle">cosine-similarity kNN graph</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 400 224 H 470"></path>
+          <rect class="soft signal" x="486" y="112" width="250" height="222" rx="12"></rect>
+          <text class="text" x="611" y="154" text-anchor="middle">GCN message passing</text>
+          <circle class="node glow" cx="562" cy="226" r="28"></circle>
+          <circle class="node" cx="640" cy="194" r="22"></circle>
+          <circle class="node" cx="660" cy="264" r="22"></circle>
+          <line class="thin dash" x1="584" y1="216" x2="620" y2="202"></line>
+          <line class="thin dash" x1="588" y1="238" x2="638" y2="258"></line>
+          <text class="small" x="611" y="300" text-anchor="middle">learned aggregation weights + head</text>
+          <text class="small" x="611" y="324" text-anchor="middle">dₕ=min(256,max(64,⌊d/10⌋))</text>
+          <text class="small" x="611" y="348" text-anchor="middle">k=min(20,max(5,⌊d/100⌋))</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 746 224 H 842"></path>
+          ${newSample(858, 108)}
+          ${aucPanel(850, 272, "from graph readout scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training learns graph aggregation; external graph-readout scores are summarized by Area Under the Curve.</text>
+        </svg>
+      `,
+
+      transformer: model => `
+        <svg viewBox="0 0 1120 520" role="img" aria-label="Transformer mechanism diagram">
+          ${marker(model.accent)}
+          ${stageLabels()}
+          <rect class="soft" x="72" y="132" width="212" height="152" rx="12"></rect>
+          <text class="text" x="178" y="172" text-anchor="middle">Training batches</text>
+          <text class="small" x="178" y="202" text-anchor="middle">tokens + labels</text>
+          ${["CLS","S1","S2"].map((label,i)=>`<rect class="node signal" style="animation-delay:${i*.12}s" x="${114+i*46}" y="228" width="38" height="28" rx="6"></rect><text class="small" x="${133+i*46}" y="247" text-anchor="middle">${label}</text>`).join("")}
+          <path class="line dash" marker-end="url(#arrow)" d="M 296 216 H 380"></path>
+          <rect class="soft" x="392" y="78" width="346" height="300" rx="14"></rect>
+          <text class="text" x="565" y="116" text-anchor="middle">Learn Q / K / V attention</text>
+          ${["CLS", "SNP 1", "SNP 2", "Gene"].map((label, i) => `
+            <rect class="node signal" style="animation-delay:${i * .1}s" x="${430 + i * 70}" y="154" width="58" height="40" rx="8"></rect>
+            <text class="small" x="${459 + i * 70}" y="179" text-anchor="middle">${label}</text>
+          `).join("")}
+          ${[0,1,2].map((i) => {
+            const x1 = 459 + i * 70;
+            const x2 = 459 + (3 - i) * 70;
+            const mid = 246 + i * 22;
+            return `<path class="thin dash" d="M ${x1} 208 C ${x1 + 34} ${mid}, ${x2 - 34} ${mid}, ${x2} 208"></path>`;
+          }).join("")}
+          <text class="formula" x="565" y="294" text-anchor="middle">attention weights</text>
+          <text class="small" x="565" y="320" text-anchor="middle">d_model=round₈(min(256,max(64,⌊d/8⌋)))</text>
+          <text class="small" x="565" y="344" text-anchor="middle">L=3 if d≥200 else 2; d_ff≤1024; patch=32 if d≥1000</text>
+          <path class="line dash" marker-end="url(#arrow)" d="M 748 216 H 842"></path>
+          ${newSample(858, 98)}
+          ${aucPanel(850, 266, "from CLS readout scores")}
+          <text class="small" x="560" y="478" text-anchor="middle">Training learns attention matrices; external CLS scores are summarized by Area Under the Curve.</text>
+        </svg>
+      `
+    };
+
+    updateModel();
+  </script>
+</body>
+</html>
