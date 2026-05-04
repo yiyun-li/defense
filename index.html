@@ -150,7 +150,7 @@
     .hero {
       min-height: calc(100vh - 48px);
       display: grid;
-      grid-template-rows: auto minmax(460px, 1fr) auto;
+      grid-template-rows: auto minmax(460px, 1fr) auto auto;
       gap: 16px;
     }
 
@@ -363,6 +363,33 @@
       font-size: 15px;
     }
 
+    .principle-note {
+      padding: 18px 20px;
+      border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+      border-left: 7px solid var(--accent);
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent-faint), rgba(255, 255, 255, 0.92));
+      box-shadow: 0 12px 28px rgba(23, 32, 38, 0.08);
+    }
+
+    .principle-note strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .principle-note p {
+      margin: 0;
+      color: #263238;
+      font-size: 18px;
+      font-weight: 650;
+      line-height: 1.55;
+    }
+
     @keyframes dash {
       from { stroke-dashoffset: 42; }
       to { stroke-dashoffset: 0; }
@@ -475,6 +502,11 @@
             <p id="defenseLine"></p>
           </article>
         </section>
+
+        <section class="principle-note" aria-label="Model principle note">
+          <strong>Principle note</strong>
+          <p id="principleNote"></p>
+        </section>
       </section>
     </main>
   </div>
@@ -491,7 +523,8 @@
         auc: "JN 0.544 | EUR 0.539",
         core: "Fold-specific GWAS estimates SNP effect sizes and p-values in the HK training fold; clumping and thresholding decide which loci enter the score.",
         animation: "The learned object is a sparse list of selected SNPs and their GWAS beta weights.",
-        defense: "For each external sample, the PRS score is used to rank cases above controls; the reported endpoint is external AUC."
+        defense: "For each external sample, the PRS score is used to rank cases above controls; the reported endpoint is external AUC.",
+        principle: "PRSice2 is a transparent additive model: after LD clumping removes highly correlated neighboring SNPs, a p-value threshold keeps variants with sufficient GWAS evidence. Prediction is then a weighted sum of genotype dosages, so each selected risk allele contributes linearly to the final SLE genetic risk score."
       },
       {
         id: "lassosum",
@@ -503,7 +536,8 @@
         auc: "JN 0.613 | EUR 0.533",
         core: "GWAS summary statistics and an LD reference are optimized under an L1 penalty, so correlated or weak SNP effects are shrunk during training.",
         animation: "The learned object is a regularized beta vector: some weights remain active, many weights move toward zero.",
-        defense: "The shrinkage-weighted score is evaluated by ROC ranking on JN and EUR; AUC is the final comparison metric."
+        defense: "The shrinkage-weighted score is evaluated by ROC ranking on JN and EUR; AUC is the final comparison metric.",
+        principle: "LassoSum keeps the PRS idea but learns more conservative SNP weights. It uses LD information to account for correlation among variants, then applies L1 shrinkage so unstable or redundant SNP effects are reduced toward zero. The final prediction is still additive, but the weights are regularized rather than copied directly from GWAS."
       },
       {
         id: "xgboost",
@@ -515,7 +549,8 @@
         auc: "JN 0.586 | EUR 0.584",
         core: "Training starts with SNP features and labels; each new tree is fitted to the residual errors left by the current ensemble.",
         animation: "The learned object is an ordered set of split rules and leaf scores, with regularization controlling tree complexity.",
-        defense: "Leaf scores are converted into sample-level prediction scores, and the external ranking is summarized as Area Under the Curve."
+        defense: "Leaf scores are converted into sample-level prediction scores, and the external ranking is summarized as Area Under the Curve.",
+        principle: "XGBoost predicts through many shallow decision trees added sequentially. Inside each tree, depth controls how many split decisions a sample can pass through: depth 1 gives one SNP rule, depth 2 allows a rule followed by another rule, and deeper trees capture higher-order SNP interactions. The path from root to leaf determines a leaf score, and the ensemble sums leaf scores from all trees."
       },
       {
         id: "rf",
@@ -527,7 +562,8 @@
         auc: "JN 0.589 | EUR 0.577",
         core: "Training repeatedly samples individuals with replacement and considers random SNP subsets at each split.",
         animation: "The learned object is a forest of diverse decision trees, each carrying different SNP split rules.",
-        defense: "Tree votes become prediction scores; the final thesis result is their AUC on the held-out external cohorts."
+        defense: "Tree votes become prediction scores; the final thesis result is their AUC on the held-out external cohorts.",
+        principle: "Random Forest also uses decision trees, but the trees are trained independently rather than sequentially. Each tree sees a bootstrap sample and only a random subset of SNPs at each split, so different trees learn different risk rules. Prediction is the averaged vote or probability across the forest, which reduces the instability of any single tree."
       },
       {
         id: "svm",
@@ -539,7 +575,8 @@
         auc: "JN 0.587 | EUR 0.554",
         core: "Training searches for a sparse linear hyperplane that separates cases and controls with the widest possible margin.",
         animation: "The learned object is a weight vector and intercept; support vectors near the margin determine the boundary.",
-        defense: "The calibrated decision scores are not the final table entry by themselves; they are summarized by external AUC."
+        defense: "The calibrated decision scores are not the final table entry by themselves; they are summarized by external AUC.",
+        principle: "SVM treats each individual as a point in high-dimensional SNP space and searches for a separating boundary between cases and controls. The key idea is the margin: the model prefers the boundary that leaves the widest gap to the nearest training samples. Those nearest samples, called support vectors, dominate the learned decision boundary."
       },
       {
         id: "mlp",
@@ -551,7 +588,8 @@
         auc: "JN 0.617 | EUR 0.590",
         core: "Training minimizes binary cross-entropy by backpropagation; gradients update dense layer weights after each batch.",
         animation: "The learned object is a stack of weight matrices, with hidden widths set adaptively from the input dimension d.",
-        defense: "The MLP outputs scores for all external samples; ranking those scores gives the reported AUC, highest on JN in the SNP benchmark."
+        defense: "The MLP outputs scores for all external samples; ranking those scores gives the reported AUC, highest on JN in the SNP benchmark.",
+        principle: "MLP passes genotype features through multiple dense nonlinear layers. Early layers combine SNPs into hidden representations, later layers compress those representations into a disease-risk logit, and backpropagation adjusts all weights together. In this thesis, hidden layer sizes adapt to the input dimension so deep learning capacity scales with the selected feature set."
       },
       {
         id: "gnn",
@@ -563,7 +601,8 @@
         auc: "JN 0.615 | EUR 0.596",
         core: "Training first builds a weighted kNN graph from genotype cosine similarity, then optimizes GCN weights by label supervision.",
         animation: "The learned object combines adaptive graph construction, GCN message-passing weights, and a classifier head over sample embeddings.",
-        defense: "Graph-informed prediction scores are evaluated by AUC; GNN gives the strongest EUR SNP-benchmark AUC."
+        defense: "Graph-informed prediction scores are evaluated by AUC; GNN gives the strongest EUR SNP-benchmark AUC.",
+        principle: "GNN first represents individuals as nodes in a genotype-similarity graph. During graph convolution, each sample updates its embedding by mixing its own features with information from similar neighboring samples. The number of neighbors and hidden dimension are adaptive, so the model can learn risk patterns from both SNP features and sample-level genetic structure."
       },
       {
         id: "transformer",
@@ -575,7 +614,8 @@
         auc: "SNP: JN 0.607 | EUR 0.566; Gene: approx. 0.630 | 0.599",
         core: "Training tokenizes SNPs, SNP patches, or genes and learns attention/query/key/value matrices by backpropagation.",
         animation: "The learned object is an attention system whose width, depth, feed-forward size, and tokenization mode adapt to the SNP feature dimension.",
-        defense: "The CLS readout produces external prediction scores; Area Under the Curve is then computed, with gene-level Transformer giving the strongest gene-level AUC."
+        defense: "The CLS readout produces external prediction scores; Area Under the Curve is then computed, with gene-level Transformer giving the strongest gene-level AUC.",
+        principle: "Transformer converts SNPs, SNP patches, or genes into tokens and lets each token attend to other tokens through query, key, and value projections. Attention weights decide which loci or gene-level signals should influence each other before prediction. This is especially useful for gene-level features because the model can rank biologically interpretable gene tokens rather than isolated SNPs."
       }
     ];
 
@@ -614,6 +654,7 @@
       document.getElementById("coreIdea").textContent = model.core;
       document.getElementById("animationNote").textContent = model.animation;
       document.getElementById("defenseLine").textContent = model.defense;
+      document.getElementById("principleNote").textContent = model.principle;
       diagram.innerHTML = diagrams[model.id](model);
       renderButtons();
     }
