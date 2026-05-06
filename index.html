@@ -398,84 +398,6 @@
       font-size: 15px;
     }
 
-    .principle-note {
-      padding: 18px 20px;
-      border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
-      border-left: 7px solid var(--accent);
-      border-radius: 8px;
-      background: linear-gradient(90deg, var(--accent-faint), rgba(255, 255, 255, 0.92));
-      box-shadow: 0 12px 28px rgba(23, 32, 38, 0.08);
-    }
-
-    .principle-note strong {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-
-    .principle-note p {
-      margin: 0;
-      color: #263238;
-      font-size: 18px;
-      font-weight: 650;
-      line-height: 1.55;
-    }
-
-    .principle-note .takeaway-label {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
-    }
-
-    .principle-note .takeaway {
-      color: #334148;
-      font-size: 17px;
-      font-weight: 600;
-    }
-
-    .defense-panel {
-      display: grid;
-      grid-template-columns: 1.05fr 1fr 1fr;
-      gap: 10px;
-    }
-
-    .defense-card {
-      padding: 15px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      min-height: 132px;
-    }
-
-    .defense-card strong {
-      display: block;
-      margin-bottom: 7px;
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .defense-card p {
-      margin: 0;
-      color: #334148;
-      font-size: 15px;
-      line-height: 1.48;
-    }
-
-    .risk-card {
-      border-color: #ead7a2;
-      background: #fffaf0;
-    }
-
-    .risk-card strong {
-      color: #8a5a0a;
-    }
-
     @keyframes dash {
       from { stroke-dashoffset: 42; }
       to { stroke-dashoffset: 0; }
@@ -522,8 +444,7 @@
       .main { padding: 14px; }
       .sidebar { padding: 18px 14px; }
       .model-list,
-      .note-row,
-      .defense-panel { grid-template-columns: 1fr; }
+      .note-row { grid-template-columns: 1fr; }
       .topbar { display: grid; }
       .canvas-card { min-height: 460px; }
       .diagram {
@@ -597,27 +518,6 @@
           </article>
         </section>
 
-        <section class="principle-note" aria-label="Model principle note">
-          <strong>Principle note</strong>
-          <p id="principleNote"></p>
-          <strong class="takeaway-label">Plain-language takeaway</strong>
-          <p class="takeaway" id="simpleTakeaway"></p>
-        </section>
-
-        <section class="defense-panel" aria-label="Defense talking points">
-          <article class="defense-card">
-            <strong>Use this model because</strong>
-            <p id="whyIncluded"></p>
-          </article>
-          <article class="defense-card">
-            <strong>Result position</strong>
-            <p id="resultPosition"></p>
-          </article>
-          <article class="defense-card risk-card">
-            <strong>Likely examiner pressure point</strong>
-            <p id="pressurePoint"></p>
-          </article>
-        </section>
       </section>
     </main>
   </div>
@@ -797,11 +697,6 @@
       document.getElementById("coreIdea").textContent = model.core;
       document.getElementById("animationNote").textContent = model.animation;
       document.getElementById("defenseLine").textContent = model.defense;
-      document.getElementById("principleNote").textContent = model.principle;
-      document.getElementById("simpleTakeaway").textContent = model.takeaway;
-      document.getElementById("whyIncluded").textContent = model.why;
-      document.getElementById("resultPosition").textContent = model.result;
-      document.getElementById("pressurePoint").textContent = model.pressure;
       diagram.innerHTML = diagrams[model.id](model);
       renderButtons();
     }
