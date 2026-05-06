@@ -270,36 +270,6 @@
       box-shadow: var(--shadow);
     }
 
-    .experiment-strip {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr 1.1fr;
-      gap: 10px;
-    }
-
-    .experiment-step {
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 20px rgba(23, 32, 38, 0.06);
-    }
-
-    .experiment-step strong {
-      display: block;
-      margin-bottom: 4px;
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .experiment-step span {
-      display: block;
-      color: #334148;
-      font-size: 14px;
-      font-weight: 650;
-    }
-
     .canvas-card::before {
       content: "";
       position: absolute;
@@ -553,7 +523,6 @@
       .sidebar { padding: 18px 14px; }
       .model-list,
       .note-row,
-      .experiment-strip,
       .defense-panel { grid-template-columns: 1fr; }
       .topbar { display: grid; }
       .canvas-card { min-height: 460px; }
@@ -608,21 +577,6 @@
             <button class="icon-button" id="nextButton" type="button" title="Next model" aria-label="Next model">›</button>
           </div>
         </header>
-
-        <section class="experiment-strip" aria-label="Experimental design summary">
-          <article class="experiment-step">
-            <strong>1. Develop in HK</strong>
-            <span>5-fold internal validation selects the operating SNP setting.</span>
-          </article>
-          <article class="experiment-step">
-            <strong>2. Lock the model</strong>
-            <span>No tuning on JN or EUR after model settings are selected.</span>
-          </article>
-          <article class="experiment-step">
-            <strong>3. Test transfer</strong>
-            <span>Female-only external AUC reduces the strongest sex-composition confound.</span>
-          </article>
-        </section>
 
         <article class="canvas-card">
           <div class="diagram" id="diagram"></div>
