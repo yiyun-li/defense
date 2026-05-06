@@ -142,6 +142,41 @@
       font-size: 13px;
     }
 
+    .cue strong {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 900;
+    }
+
+    .cue + .cue {
+      margin-top: 10px;
+      border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+      background: var(--accent-faint);
+      color: #263238;
+    }
+
+    .demo-link {
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 14px;
+      padding: 11px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .demo-link:hover,
+    .demo-link:focus-visible {
+      outline: none;
+      box-shadow: 0 10px 24px rgba(23, 32, 38, 0.12);
+    }
+
     .main {
       min-width: 0;
       padding: 24px;
@@ -233,6 +268,36 @@
         #fbfcfc;
       background-size: 32px 32px;
       box-shadow: var(--shadow);
+    }
+
+    .experiment-strip {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1.1fr;
+      gap: 10px;
+    }
+
+    .experiment-step {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 20px rgba(23, 32, 38, 0.06);
+    }
+
+    .experiment-step strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .experiment-step span {
+      display: block;
+      color: #334148;
+      font-size: 14px;
+      font-weight: 650;
     }
 
     .canvas-card::before {
@@ -402,6 +467,45 @@
       font-weight: 600;
     }
 
+    .defense-panel {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .defense-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      min-height: 132px;
+    }
+
+    .defense-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .defense-card p {
+      margin: 0;
+      color: #334148;
+      font-size: 15px;
+      line-height: 1.48;
+    }
+
+    .risk-card {
+      border-color: #ead7a2;
+      background: #fffaf0;
+    }
+
+    .risk-card strong {
+      color: #8a5a0a;
+    }
+
     @keyframes dash {
       from { stroke-dashoffset: 42; }
       to { stroke-dashoffset: 0; }
@@ -448,7 +552,9 @@
       .main { padding: 14px; }
       .sidebar { padding: 18px 14px; }
       .model-list,
-      .note-row { grid-template-columns: 1fr; }
+      .note-row,
+      .experiment-strip,
+      .defense-panel { grid-template-columns: 1fr; }
       .topbar { display: grid; }
       .canvas-card { min-height: 460px; }
       .diagram {
@@ -473,14 +579,21 @@
 
       <div class="nav-title">Models</div>
       <nav class="model-list" id="modelList" aria-label="Model selector"></nav>
+      <a class="demo-link" href="#liveDemo">Start live demo</a>
 
       <div class="cue">
-        Presentation rhythm: explain each model in three beats: training data, learned parameters, and Area Under the Curve evaluation.
+        <strong>Live defense rhythm</strong>
+        Explain each model in three beats: training data, learned parameters, and external AUC evaluation.
+      </div>
+
+      <div class="cue">
+        <strong>Safe transition back to PPT</strong>
+        After Transformer, say: "Now that the model principles are clear, I will return to the benchmark results."
       </div>
     </aside>
 
     <main class="main">
-      <section class="hero" aria-live="polite">
+      <section class="hero" id="liveDemo" aria-live="polite">
         <header class="topbar">
           <div>
             <div class="model-label" id="modelFamily">Linear PRS baseline</div>
@@ -495,6 +608,21 @@
             <button class="icon-button" id="nextButton" type="button" title="Next model" aria-label="Next model">›</button>
           </div>
         </header>
+
+        <section class="experiment-strip" aria-label="Experimental design summary">
+          <article class="experiment-step">
+            <strong>1. Develop in HK</strong>
+            <span>5-fold internal validation selects the operating SNP setting.</span>
+          </article>
+          <article class="experiment-step">
+            <strong>2. Lock the model</strong>
+            <span>No tuning on JN or EUR after model settings are selected.</span>
+          </article>
+          <article class="experiment-step">
+            <strong>3. Test transfer</strong>
+            <span>Female-only external AUC reduces the strongest sex-composition confound.</span>
+          </article>
+        </section>
 
         <article class="canvas-card">
           <div class="diagram" id="diagram"></div>
@@ -521,6 +649,21 @@
           <strong class="takeaway-label">Plain-language takeaway</strong>
           <p class="takeaway" id="simpleTakeaway"></p>
         </section>
+
+        <section class="defense-panel" aria-label="Defense talking points">
+          <article class="defense-card">
+            <strong>Use this model because</strong>
+            <p id="whyIncluded"></p>
+          </article>
+          <article class="defense-card">
+            <strong>Result position</strong>
+            <p id="resultPosition"></p>
+          </article>
+          <article class="defense-card risk-card">
+            <strong>Likely examiner pressure point</strong>
+            <p id="pressurePoint"></p>
+          </article>
+        </section>
       </section>
     </main>
   </div>
@@ -539,7 +682,10 @@
         animation: "The learned object is a sparse list of selected SNPs and their GWAS beta weights.",
         defense: "For each external sample, the PRS score is used to rank cases above controls; the reported endpoint is external AUC.",
         principle: "PRSice2 is a transparent additive model: after LD clumping removes highly correlated neighboring SNPs, a p-value threshold keeps variants with sufficient GWAS evidence. Prediction is then a weighted sum of genotype dosages, so each selected risk allele contributes linearly to the final SLE genetic risk score.",
-        takeaway: "Think of PRSice2 as a genetic checklist: keep SNPs that pass the GWAS and LD rules, multiply each genotype by its effect size, and add everything into one risk score."
+        takeaway: "Think of PRSice2 as a genetic checklist: keep SNPs that pass the GWAS and LD rules, multiply each genotype by its effect size, and add everything into one risk score.",
+        why: "It is the standard clumping-and-thresholding PRS baseline, so it anchors the benchmark with a transparent additive method.",
+        result: "It is low in both retained external cohorts, which shows the difficulty of simple additive PRS transfer after HLA exclusion.",
+        pressure: "If asked why PRSice2 is weak, emphasize ancestry transfer, non-HLA focus, additive assumptions, and LD / allele-frequency differences."
       },
       {
         id: "lassosum",
@@ -553,7 +699,10 @@
         animation: "The learned object is a regularized beta vector: some weights remain active, many weights move toward zero.",
         defense: "The shrinkage-weighted score is evaluated by ROC ranking on JN and EUR; AUC is the final comparison metric.",
         principle: "LassoSum keeps the PRS idea but learns more conservative SNP weights. It uses LD information to account for correlation among variants, then applies L1 shrinkage so unstable or redundant SNP effects are reduced toward zero. The final prediction is still additive, but the weights are regularized rather than copied directly from GWAS.",
-        takeaway: "Think of LassoSum as PRS with weight correction: it still adds SNP effects, but it down-weights redundant or uncertain signals before producing the final score."
+        takeaway: "Think of LassoSum as PRS with weight correction: it still adds SNP effects, but it down-weights redundant or uncertain signals before producing the final score.",
+        why: "It represents a stronger linear shrinkage PRS baseline than simple C+T, so the comparison is not only against a weak PRS method.",
+        result: "It is competitive in JN but drops in EUR, suggesting that shrinkage helps some transfer settings but does not solve cross-ancestry decay.",
+        pressure: "If asked why PRS-CS or LDpred2 is missing, say LassoSum is one strong representative, but broader PRS coverage is a limitation."
       },
       {
         id: "xgboost",
@@ -567,7 +716,10 @@
         animation: "The learned object is an ordered set of split rules and leaf scores, with regularization controlling tree complexity.",
         defense: "Leaf scores are converted into sample-level prediction scores, and the external ranking is summarized as Area Under the Curve.",
         principle: "XGBoost predicts through many shallow decision trees added sequentially. Inside each tree, depth controls how many split decisions a sample can pass through: depth 1 gives one SNP rule, depth 2 allows a rule followed by another rule, and deeper trees capture higher-order SNP interactions. The path from root to leaf determines a leaf score, and the ensemble sums leaf scores from all trees.",
-        takeaway: "Think of XGBoost as many small rule books written one after another: each new tree focuses on samples the earlier trees handled poorly, and the final prediction is the sum of all tree outputs."
+        takeaway: "Think of XGBoost as many small rule books written one after another: each new tree focuses on samples the earlier trees handled poorly, and the final prediction is the sum of all tree outputs.",
+        why: "It tests whether tree-based nonlinear interaction rules can improve over additive PRS without using deep neural networks.",
+        result: "It forms a stable middle-to-strong classical ML baseline and performs close to deep models in EUR.",
+        pressure: "If asked about overfitting, point to external testing, regularization, and the fact that the claim is comparative, not clinical deployment."
       },
       {
         id: "rf",
@@ -581,7 +733,10 @@
         animation: "The learned object is a forest of diverse decision trees, each carrying different SNP split rules.",
         defense: "Tree votes become prediction scores; the final thesis result is their AUC on the held-out external cohorts.",
         principle: "Random Forest also uses decision trees, but the trees are trained independently rather than sequentially. Each tree sees a bootstrap sample and only a random subset of SNPs at each split, so different trees learn different risk rules. Prediction is the averaged vote or probability across the forest, which reduces the instability of any single tree.",
-        takeaway: "Think of Random Forest as a committee of trees: each tree votes from a slightly different view of the data, and averaging the votes makes the prediction more stable."
+        takeaway: "Think of Random Forest as a committee of trees: each tree votes from a slightly different view of the data, and averaging the votes makes the prediction more stable.",
+        why: "It gives a bagging-based nonlinear baseline, useful because it is robust and easy to explain.",
+        result: "It is not the top model overall, but it helps show that not every nonlinear method gains equally under external transfer.",
+        pressure: "If asked why RF is not best, explain that high-dimensional sparse SNP settings can make tree splits unstable across cohorts."
       },
       {
         id: "svm",
@@ -595,7 +750,10 @@
         animation: "The learned object is a weight vector and intercept; support vectors near the margin determine the boundary.",
         defense: "The calibrated decision scores are not the final table entry by themselves; they are summarized by external AUC.",
         principle: "SVM treats each individual as a point in high-dimensional SNP space and searches for a separating boundary between cases and controls. The key idea is the margin: the model prefers the boundary that leaves the widest gap to the nearest training samples. Those nearest samples, called support vectors, dominate the learned decision boundary.",
-        takeaway: "Think of SVM as drawing the safest possible line between cases and controls: the boundary is chosen by the most difficult samples near the edge."
+        takeaway: "Think of SVM as drawing the safest possible line between cases and controls: the boundary is chosen by the most difficult samples near the edge.",
+        why: "It provides a sparse high-dimensional linear classifier, distinct from PRS because it learns the separating boundary directly from individual-level data.",
+        result: "It is moderate in both external cohorts, supporting the idea that linear separation alone is limited for this task.",
+        pressure: "If asked why linear SVM rather than nonlinear kernel SVM, say scalability and high-dimensional genomic stability were the main reasons."
       },
       {
         id: "mlp",
@@ -609,7 +767,10 @@
         animation: "The learned object is a stack of weight matrices, with hidden widths set adaptively from the input dimension d.",
         defense: "The MLP outputs scores for all external samples; ranking those scores gives the reported AUC, highest on JN in the SNP benchmark.",
         principle: "MLP passes genotype features through multiple dense nonlinear layers. Early layers combine SNPs into hidden representations, later layers compress those representations into a disease-risk logit, and backpropagation adjusts all weights together. In this thesis, hidden layer sizes adapt to the input dimension so deep learning capacity scales with the selected feature set.",
-        takeaway: "Think of MLP as a nonlinear feature mixer: it repeatedly recombines SNP inputs into hidden signals, then converts the final hidden pattern into an SLE risk score."
+        takeaway: "Think of MLP as a nonlinear feature mixer: it repeatedly recombines SNP inputs into hidden signals, then converts the final hidden pattern into an SLE risk score.",
+        why: "It tests whether generic nonlinear representation learning can improve SLE SNP-level prediction.",
+        result: "It gives the highest JN SNP-level AUC, so it is the clearest within-East-Asian deep learning success case.",
+        pressure: "If asked about overfitting, emphasize dropout, weight decay, early stopping, and locked external testing, while admitting sample size is limited."
       },
       {
         id: "gnn",
@@ -623,7 +784,10 @@
         animation: "The learned object combines adaptive graph construction, GCN message-passing weights, and a classifier head over sample embeddings.",
         defense: "Graph-informed prediction scores are evaluated by AUC; GNN gives the strongest EUR SNP-benchmark AUC.",
         principle: "GNN first represents individuals as nodes in a genotype-similarity graph. During graph convolution, each sample updates its embedding by mixing its own features with information from similar neighboring samples. The number of neighbors and hidden dimension are adaptive, so the model can learn risk patterns from both SNP features and sample-level genetic structure.",
-        takeaway: "Think of GNN as prediction with neighbors: each person is judged not only by their own genotype features, but also by information from genetically similar samples."
+        takeaway: "Think of GNN as prediction with neighbors: each person is judged not only by their own genotype features, but also by information from genetically similar samples.",
+        why: "It tests whether sample-level genetic similarity can add useful information beyond independent per-sample SNP features.",
+        result: "It gives the strongest EUR SNP-level AUC, but the interpretation must be careful because it is relation-aware.",
+        pressure: "The hard question is transductive behavior: graphs are built within each cohort, so this is not a simple independent-instance clinical predictor."
       },
       {
         id: "transformer",
@@ -637,7 +801,10 @@
         animation: "The learned object is an attention system whose width, depth, feed-forward size, and tokenization mode adapt to the SNP feature dimension.",
         defense: "The CLS readout produces external prediction scores; Area Under the Curve is then computed, with gene-level Transformer giving the strongest gene-level AUC.",
         principle: "Transformer converts SNPs, SNP patches, or genes into tokens and lets each token attend to other tokens through query, key, and value projections. Attention weights decide which loci or gene-level signals should influence each other before prediction. This is especially useful for gene-level features because the model can rank biologically interpretable gene tokens rather than isolated SNPs.",
-        takeaway: "Think of Transformer as a relevance-weighing system: every SNP or gene token can look at other tokens, decide what matters, and combine those signals before making a prediction."
+        takeaway: "Think of Transformer as a relevance-weighing system: every SNP or gene token can look at other tokens, decide what matters, and combine those signals before making a prediction.",
+        why: "It tests attention-based feature interaction and also supports gene-level feature importance for biological interpretation.",
+        result: "It is not the top raw SNP model, but gene aggregation helps it most clearly and makes it the strongest gene-level model in both external cohorts.",
+        pressure: "If asked whether attention proves causality, say no: the gene ranking is hypothesis-generating and needs eQTL, fine-mapping, or functional validation."
       }
     ];
 
@@ -678,6 +845,9 @@
       document.getElementById("defenseLine").textContent = model.defense;
       document.getElementById("principleNote").textContent = model.principle;
       document.getElementById("simpleTakeaway").textContent = model.takeaway;
+      document.getElementById("whyIncluded").textContent = model.why;
+      document.getElementById("resultPosition").textContent = model.result;
+      document.getElementById("pressurePoint").textContent = model.pressure;
       diagram.innerHTML = diagrams[model.id](model);
       renderButtons();
     }
