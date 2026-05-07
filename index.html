@@ -369,6 +369,12 @@
       font-weight: 900;
     }
 
+    .principle-caption {
+      fill: var(--ink);
+      font-size: 19px;
+      font-weight: 850;
+    }
+
     .note-row {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -805,7 +811,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 730 220 H 844"></path>
           ${newSample(858, 116)}
           ${aucPanel(850, 276, "from PRS scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -826,7 +832,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 730 214 H 845"></path>
           ${newSample(858, 112)}
           ${aucPanel(850, 276, "from G · β̂ scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -855,7 +861,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 742 216 H 842"></path>
           ${newSample(858, 114)}
           ${aucPanel(850, 278, "from summed leaf scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -886,7 +892,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 742 216 H 842"></path>
           ${newSample(858, 104)}
           ${aucPanel(850, 270, "from averaged tree votes")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -909,7 +915,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 724 226 H 842"></path>
           ${newSample(858, 114)}
           ${aucPanel(850, 278, "from calibrated margins")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -940,7 +946,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 676 220 H 842"></path>
           ${newSample(858, 106)}
           ${aucPanel(850, 272, "from sigmoid/logit scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -971,7 +977,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 746 224 H 842"></path>
           ${newSample(858, 108)}
           ${aucPanel(850, 272, "from graph readout scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `,
 
@@ -1002,7 +1008,7 @@
           <path class="line dash" marker-end="url(#arrow)" d="M 748 216 H 842"></path>
           ${newSample(858, 98)}
           ${aucPanel(850, 266, "from CLS readout scores")}
-          <text class="small" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
+          <text class="principle-caption" x="560" y="478" text-anchor="middle">${model.oneLine}</text>
         </svg>
       `
     };
